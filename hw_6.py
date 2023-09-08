@@ -3,6 +3,7 @@ import sys
 from pathlib import Path
 import re
 import patoolib
+import shutil 
 
 
 CATEGORIES = {
@@ -34,23 +35,7 @@ def get_categories(file: Path) -> str:
             return cat
     return "Other"
 
-def unpack_archives(path: Path) -> None:
-    archive_folder = path.joinpath("Archive")
-    for file_name in archive_folder.glob("*"):
-        if file_name.is_file():
-            extract_folder = file_name.stem
-            extract_path = archive_folder.joinpath(extract_folder)
-            extract_path.mkdir(exist_ok=True)
-            patoolib.extract_archive(str(file_name), outdir=str(extract_path))
 
-def delete_empty_folders(path: Path) -> None:
-    for folder in list(path.glob("**/*"))[::-1]:
-        if folder.is_dir() and not any(folder.iterdir()):
-            is_category_folder = any(cat in CATEGORIES.keys()
-                                     for cat in folder.name)
-            if not is_category_folder:
-                folder.rmdir()
-                
 def move_file(file: Path, category: str, root_dir: Path) -> None:
     target_dir = root_dir.joinpath(category)
     if not target_dir.exists():
@@ -67,23 +52,23 @@ def sort_folder(path: Path) -> None:
             move_file(element, category, path)
 
 
-# def delete_empty_folders(path: Path) -> None:
-#     for folder in list(path.glob("**/*"))[::-1]:
-#         if folder.is_dir() and not any(folder.iterdir()):
-#             is_category_folder = any(cat in CATEGORIES.keys()
-#                                      for cat in folder.name)
-#             if not is_category_folder:
-#                 folder.rmdir()
+def delete_empty_folders(path: Path) -> None:
+    for folder in list(path.glob("**/*"))[::-1]:
+        if folder.is_dir() and not any(folder.iterdir()):
+            is_category_folder = any(cat in CATEGORIES.keys()
+                                     for cat in folder.name)
+            if not is_category_folder:
+                folder.rmdir()
 
 
-# def unpack_archives(path: Path) -> None:
-#     archive_folder = path.joinpath("Archive")
-#     for file_name in archive_folder.glob("*"):
-#         if file_name.is_file():
-#             extract_folder = file_name.stem
-#             extract_path = archive_folder.joinpath(extract_folder)
-#             extract_path.mkdir(exist_ok=True)
-#             patoolib.extract_archive(str(file_name), outdir=str(extract_path))
+def unpack_archives(path: Path) -> None:
+    archive_folder = path.joinpath("Archive")
+    for file_name in archive_folder.glob("*"):
+        if file_name.is_file():
+            extract_folder = file_name.stem
+            extract_path = archive_folder.joinpath(extract_folder)
+            extract_path.mkdir(exist_ok=True)
+            patoolib.extract_archive(str(file_name), outdir=str(extract_path))
 
 
 def main():
