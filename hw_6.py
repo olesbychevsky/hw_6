@@ -2,7 +2,7 @@ from shutil import unpack_archive
 import sys
 from pathlib import Path
 import re
-import shutil 
+import shutil
 
 
 CATEGORIES = {
