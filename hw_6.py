@@ -2,7 +2,6 @@ from shutil import unpack_archive
 import sys
 from pathlib import Path
 import re
-import patoolib
 import shutil 
 
 
@@ -68,22 +67,25 @@ def unpack_archives(path: Path) -> None:
             extract_folder = file_name.stem
             extract_path = archive_folder.joinpath(extract_folder)
             extract_path.mkdir(exist_ok=True)
-            patoolib.extract_archive(str(file_name), outdir=str(extract_path))
+            shutil.unpack_archive(str(file_name), extract_path)
 
 
 def main():
     try:
         path = Path(sys.argv[1])
     except IndexError:
-        return "No path to folder"
+        print("No path to folder")
+        return
 
     if not path.exists():
-        return f"Folder with path {path} does`n exists."
+        print(f"Folder with path {path} does not exist.")
+        return
+
     sort_folder(path)
-    unpack_archive(path)
+    unpack_archives(path)
     delete_empty_folders(path)
 
-    return "The task has been completed"
+    print("The task has been completed")
 
 
 if __name__ == "__main__":
