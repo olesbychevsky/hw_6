@@ -13,6 +13,10 @@ CATEGORIES = {
     "Archive": [".zip", ".7-zip", ".7zip", ".rar", ".gz", ".tar"],
     "Book": [".fb2", ".mobi"]}
 
+known_extensions = set(ext for ext_list in CATEGORIES.values() for ext in ext_list)
+encountered_extensions = set()
+unknown_extensions = set()
+
 
 def normalize(name):
     CYRILLIC_SYMBOLS = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяєіїґ"
@@ -32,6 +36,7 @@ def get_categories(file: Path) -> str:
     for cat, exts in CATEGORIES.items():
         if ext in exts:
             return cat
+    unknown_extensions.add(ext)
     return "Other"
 
 
@@ -49,6 +54,7 @@ def sort_folder(path: Path) -> None:
         if element.is_file():
             category = get_categories(element)
             move_file(element, category, path)
+            encountered_extensions.add(element.suffix.lower())
 
 
 def delete_empty_folders(path: Path) -> None:
@@ -86,6 +92,27 @@ def main():
     delete_empty_folders(path)
 
     print("The task has been completed")
+
+
+    print("\nFiles in Each Category:")
+    for category in CATEGORIES.keys():
+        category_path = path.joinpath(category)
+        if category_path.exists():
+            category_files = list(category_path.glob("*"))
+            if category_files:
+                print(f"{category}:")
+                for file in category_files:
+                    print(f" - {file}")
+
+
+    print("\nUsed extentions:")
+    for ext in encountered_extensions:
+        print(ext)
+
+
+    print("\nUnknown Extensions:")
+    for ext in unknown_extensions:
+        print(ext)
 
 
 if __name__ == "__main__":
